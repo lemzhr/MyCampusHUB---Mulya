@@ -1,0 +1,60 @@
+name: mycampushub
+description: "MyCampusHUB - Aplikasi Mobile Kampus"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Firebase
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.4
+  cloud_firestore: ^5.5.0
+  # Image & File Picker
+  image_picker: ^1.1.2
+  file_picker: ^13.1.0
+
+  # Video Player
+  video_player: ^2.9.2
+  chewie: ^1.10.0
+
+  # Cached Network Image
+  cached_network_image: ^3.4.1
+
+  # URL Launcher (for contact)
+  url_launcher: ^6.3.1
+
+  # Permission Handler
+  permission_handler: ^11.3.1
+
+  # Google Fonts
+  google_fonts: ^6.2.1
+
+  # Shimmer loading effect
+  shimmer: ^3.0.0
+
+  # Intl for date formatting
+  intl: ^0.19.0
+
+  # Shared Preferences
+  shared_preferences: ^2.3.4
+  supabase_flutter: ^2.18.0
+  http: ^1.6.0
+  html: ^0.15.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

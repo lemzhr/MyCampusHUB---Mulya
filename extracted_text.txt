@@ -1,0 +1,607 @@
+LAPORAN PRAKTIKUM 
+VARIABLE DAN TIPE DATA, FUNCTION, OPERATOR, DAN CONTROL FLOW
+Disusun Oleh:
+Naama
+: Mulya Fani
+Nim
+: 2024903430019
+Kelas
+: TRKJ 
+2B
+Jurusan 
+: Teknologi Informasi dan Komputer
+Program Studi
+: Teknologi Rekayasa Komputer Jaringan
+Dosen Pembimbing
+:
+ 
+Hari Toha Hidayat, S.Si. M.Cs.
+TEKNOLOGI REKAYASA KOMPUTER JARINGAN
+TEKNOLOGI INFORMASI DAN KOMPUTER
+POLITEKNIK NEGERI LHOKSEUMAWE
+2026
+1. Tujuan
+Memahami cara membuat project baru Flutter menggunakan Command Palette pada Visual Studio Code.
+Memahami struktur dasar aplikasi Flutter (fungsi main, MaterialApp, dan Scaffold).
+Mampu membuat antarmuka login menggunakan widget TextField, SizedBox, dan ElevatedButton.
+Mampu menjalankan aplikasi Flutter pada emulator atau browser (Chrome).
+Memahami rancangan antarmuka halaman unggah dokumen (KTP, KTM, dan foto profil) beserta penyimpanannya ke Firebase Cloud Storage.
+Memahami rancangan halaman beranda My Campus Hub sebagai tujuan navigasi setelah login berhasil.
+2. Dasar Teori
+2.1 Antarmuka Pengguna (UI) dan Pengalaman Pengguna (UX)
+Antarmuka pengguna (User Interface) adalah tampilan yang berinteraksi langsung dengan pengguna, sedangkan pengalaman pengguna (User Experience) adalah kesan dan kemudahan yang dirasakan pengguna saat memakai aplikasi. Antarmuka yang baik disusun konsisten, jelas, dan mudah dipahami, misalnya dengan pengelompokan menu, penggunaan ikon yang mewakili fungsinya, serta pembedaan warna antar-menu.
+2.2 Indikator Progres Langkah (Stepper)
+Indikator progres menunjukkan posisi pengguna dalam alur yang terdiri dari beberapa tahap, misalnya “2 dari 3”. Elemen ini membantu pengguna mengetahui berapa langkah yang sudah dan belum diselesaikan, sehingga proses pendaftaran terasa lebih terarah.
+2.3 Komponen Kartu (Card)
+Card adalah komponen Material Design yang mengelompokkan informasi dan aksi yang saling berkaitan dalam satu wadah. Pada halaman Unggah Dokumen, setiap dokumen (KTP, KTM, dan foto profil) ditampilkan dalam satu kartu yang memuat gambar contoh, judul, dan tombol aksi.
+2.4 Pengambilan Gambar dan Pemilihan Berkas
+Aplikasi dapat memperoleh gambar dari dua sumber, yaitu kamera perangkat (Ambil Foto) dan penyimpanan perangkat (Pilih File). Pada Flutter, fungsi ini umumnya dibuat dengan bantuan paket tambahan seperti image_picker dan file_picker. Aplikasi perlu meminta izin pengguna terlebih dahulu untuk mengakses kamera dan penyimpanan.
+2.5 Penyimpanan Dokumen pada Cloud Storage
+Dokumen yang dipilih pengguna dikirim ke layanan penyimpanan awan seperti Firebase Cloud Storage, bukan disimpan di dalam aplikasi. Pada Flutter, layanan ini diakses melalui paket firebase_storage. Keterangan “Terhubung” pada rancangan menandakan bahwa aplikasi sudah tersambung ke layanan penyimpanan tersebut. Karena KTP dan KTM termasuk data pribadi, penyimpanannya perlu dilindungi dengan aturan akses (security rules) dan autentikasi pengguna.
+2.6 Menu Grid
+Menu grid menampilkan beberapa pilihan fitur dalam susunan kotak yang rapi, biasanya berisi ikon dan label. Pada Flutter, tata letak ini dapat dibuat dengan widget GridView. Tampilan ini memudahkan pengguna menemukan fitur utama dalam satu layar, seperti pada beranda My Campus Hub.
+2.7 Bilah Navigasi Bawah (Bottom Navigation Bar)
+Bilah navigasi bawah adalah komponen untuk berpindah antar-halaman utama dengan satu sentuhan, dan mudah dijangkau ibu jari. Pada Flutter, komponen ini dibuat dengan widget BottomNavigationBar atau NavigationBar. Pada rancangan, bilah ini berisi Home, Jadwal, Kalender, dan Notifikasi.
+3. Alat dan Bahan
+4. Langkah-Langkah Praktikum
+Praktikum ini mengembangkan aplikasi mobile MyCampusHUB menggunakan Flutter dengan backend Firebase (Authentication & Firestore) dan Supabase Storage. Langkah-langkah dibagi menjadi empat bagian utama:
+A. Persiapan Project
+B. Pembuatan Halaman Login & Registrasi
+C. Pembuatan Halaman Upload Dokumen (KTP, KTM, Foto Profil)
+D. Pembuatan Halaman Beranda (Home Screen)
+A. Persiapan Project Flutter
+A.1 Membuat Project Flutter Baru
+Langkah 1: Buka Visual Studio Code
+Jalankan VS Code, kemudian buka Command Palette dengan menekan Ctrl + Shift + P.
+Langkah 2: Buat project baru melalui Command Palette
+Ketik "Flutter: New Project" → pilih Application → pilih direktori penyimpanan → beri nama project: mycampushub → tekan Enter.
+Langkah 3: Verifikasi project berhasil dibuat
+Pastikan struktur folder terbentuk dengan benar: lib/, android/, ios/, web/, pubspec.yaml, dll.
+Langkah 4: Buka terminal di VS Code
+Tekan Ctrl + ` (backtick) untuk membuka terminal terintegrasi.
+Langkah 5: Jalankan flutter doctor
+Ketik perintah berikut untuk memverifikasi instalasi Flutter:
+    
+flutter doctor
+Pastikan tidak ada error kritis yang ditampilkan.
+A.2 Menambahkan Dependencies (pubspec.yaml)
+Buka file pubspec.yaml dan tambahkan semua paket yang diperlukan pada bagian dependencies:
+dependencies:
+  
+flutter:
+    
+sdk: flutter
+  
+firebase_core: latest
+  
+firebase_auth: latest
+  
+cloud_firestore: latest
+  
+supabase_flutter: latest
+  
+image_picker: latest
+  
+permission_handler: latest
+  
+shared_preferences: latest
+  
+cached_network_image: latest
+Langkah 6: Jalankan flutter pub get
+Setelah menyimpan pubspec.yaml, jalankan:
+    
+flutter pub get
+untuk mengunduh semua paket.
+A.3 Konfigurasi Firebase
+Langkah 7: Buat project Firebase
+Buka https://console.firebase.google.com → klik "Add project" → beri nama "mycampushub" → ikuti langkah setup.
+Langkah 8: Aktifkan Authentication
+Di Firebase Console → pilih Authentication → klik "Get Started" → aktifkan metode "Email/Password".
+Langkah 9: Aktifkan Cloud Firestore
+Di Firebase Console → pilih Firestore Database → klik "Create database" → pilih mode "Test mode" → klik "Next" → pilih lokasi → klik "Enable".
+Langkah 10: Inisialisasi Firebase di main.dart
+Salin konfigurasi FirebaseOptions dari Firebase Console dan tambahkan ke fungsi main() dengan memanggil Firebase.initializeApp().
+Catatan: 
+Pada aplikasi ini, FirebaseOptions sudah dikonfigurasi dengan apiKey, projectId, storageBucket, dan appId sesuai project mycampushub-a40b9.
+A.4 Konfigurasi Supabase Storage
+Langkah 11: Buat project Supabase
+Buka https://supabase.com → Sign In → New Project → isi nama project → buat project.
+Langkah 12: Buat bucket storage
+Di Supabase Dashboard → pilih Storage → klik "New Bucket" → beri nama "mycampushub-storage" → centang "Public bucket" → klik "Save".
+Langkah 13: Inisialisasi Supabase di main.dart
+Tambahkan kode berikut di fungsi main() setelah Firebase.initializeApp():
+    
+await Supabase.initialize(
+      
+url: 'https://[project-ref].supabase.co',
+      
+anonKey: '[anon-key]',
+    
+);
+B. Membuat Halaman Login & Registrasi (login_screen.dart)
+Halaman login menampilkan form beranda dengan animasi slide-up. Halaman ini mendukung dua mode: Login dan Registrasi, yang dapat berganti secara dinamis.
+B.1 Membuat File login_screen.dart
+Langkah 1: Buat file baru di lib/screens/
+Di VS Code, klik kanan folder lib/screens/ → pilih "New File" → beri nama login_screen.dart.
+Langkah 2: Import package yang diperlukan
+Tambahkan import berikut di bagian atas file:
+    
+import 'package:flutter/material.dart';
+    
+import 'package:firebase_auth/firebase_auth.dart';
+    
+import 'package:cloud_firestore/cloud_firestore.dart';
+    
+import 'package:shared_preferences/shared_preferences.dart';
+    
+import '../utils/app_theme.dart';
+    
+import 'home_screen.dart';
+B.2 Membuat StatefulWidget LoginScreen
+Langkah 3: Deklarasikan class LoginScreen sebagai StatefulWidget
+Buat class LoginScreen extends StatefulWidget dengan override createState() → _LoginScreenState.
+Langkah 4: Deklarasikan variabel state
+Di dalam _LoginScreenState, tambahkan:
+    • 
+GlobalKey<FormState> _formKey — untuk validasi form
+    • 
+TextEditingController _emailController — untuk field Email
+    • 
+TextEditingController _passwordController — untuk field Password
+    • 
+TextEditingController _nameController — untuk field Nama (mode Registrasi)
+    • 
+TextEditingController _nimController — untuk field NIM (mode Registrasi)
+    • 
+bool _obscurePassword = true — untuk toggle visibilitas password
+    • 
+bool _isLoading = false — untuk indikator loading
+    • 
+bool _isRegisterMode = false — untuk toggle mode Login/Registrasi
+    • 
+AnimationController _animController — untuk animasi slide & fade
+    • 
+Animation<Offset> _slideAnim dan Animation<double> _fadeAnim
+Langkah 5: Inisialisasi animasi di initState()
+Buat AnimationController dengan durasi 800ms, lalu buat:
+    
+- _slideAnim: Tween dari Offset(0, 0.3) ke Offset.zero (efek slide dari bawah)
+    
+- _fadeAnim: Tween dari 0.0 ke 1.0 (efek fade in)
+    
+Panggil _animController.forward() untuk menjalankan animasi.
+B.3 Membuat Fungsi Login (_login)
+Langkah 6: Tambahkan metode _login() async
+    
+1. Validasi form dengan _formKey.currentState!.validate()
+    
+2. Set _isLoading = true
+    
+3. Panggil FirebaseAuth.instance.signInWithEmailAndPassword() dengan email dan password
+    
+4. Simpan status login ke SharedPreferences: prefs.setBool('isLoggedIn', true)
+    
+5. Navigasi ke HomeScreen menggunakan Navigator.pushReplacement()
+    
+6. Tangani error FirebaseAuthException: tampilkan pesan sesuai error code
+      
+(user-not-found, wrong-password, invalid-email)
+    
+7. Set _isLoading = false di blok finally
+B.4 Membuat Fungsi Registrasi (_register)
+Langkah 7: Tambahkan metode _register() async
+    
+1. Validasi form
+    
+2. Panggil FirebaseAuth.instance.createUserWithEmailAndPassword()
+    
+3. Simpan data user ke Firestore collection 'users' dengan field:
+      
+uid, name, nim, email, createdAt, photoUrl, role
+    
+4. Update display name dengan credential.user!.updateDisplayName()
+    
+5. Simpan status login ke SharedPreferences
+    
+6. Tampilkan pesan sukses dan navigasi ke HomeScreen
+B.5 Membangun UI (build method)
+Langkah 8: Buat body dengan gradient background
+Gunakan Container dengan BoxDecoration dan LinearGradient warna biru (Color(0xFF1565C0) → Color(0xFF0D47A1)) dari atas ke bawah.
+Langkah 9: Tambahkan header (logo + judul)
+Di bagian atas layar, tampilkan:
+    
+- Container berbentuk kotak rounded dengan ikon Icons.school_rounded (ukuran 52)
+    
+- Text "MY CAMPUS HUB" (bold, putih, letter spacing 2)
+    
+- Text "Portal Mahasiswa Digital" (putih transparan)
+Langkah 10: Buat kartu form dengan animasi
+Bungkus form dalam FadeTransition dan SlideTransition agar muncul dengan animasi. Kartu dibuat dengan Container berwarna putih, borderRadius topLeft dan topRight Radius.circular(35).
+Langkah 11: Tambahkan field-field form
+Di dalam Form widget, tambahkan:
+    
+[Mode Registrasi saja]
+    
+- TextFormField Nama Lengkap (prefixIcon: Icons.person_outline)
+    
+- TextFormField NIM (keyboardType: number, prefixIcon: Icons.badge_outlined)
+    
+[Selalu tampil]
+    
+- TextFormField Email (keyboardType: emailAddress, prefixIcon: Icons.email_outlined)
+    
+- TextFormField Password (obscureText: _obscurePassword, suffixIcon toggle visibility)
+    
+[Mode Login saja]
+    
+- TextButton "Lupa Password?" (di sebelah kanan)
+Langkah 12: Tambahkan ElevatedButton aksi
+Tombol selebar layar (width: double.infinity) dengan teks "Masuk" atau "Daftar" sesuai mode. Jika _isLoading=true, tampilkan CircularProgressIndicator di dalam tombol.
+Langkah 13: Tambahkan tombol toggle mode
+Di bagian bawah form, tampilkan Row berisi Text dan TextButton untuk berpindah antara mode Login ("Belum punya akun? Daftar") dan Registrasi ("Sudah punya akun? Masuk").
+Catatan: 
+Saat tombol toggle ditekan, panggil setState({ _isRegisterMode = !_isRegisterMode }) dan reset form.
+C. Membuat Halaman Upload Dokumen
+Aplikasi MyCampusHUB memiliki tiga halaman upload dokumen: Upload Foto Profil, Upload KTP, dan Upload KTM. Semuanya menggunakan pola yang sama.
+C.1 Halaman Upload Foto (upload_foto_screen.dart)
+Langkah 1: Buat file lib/screens/upload_foto_screen.dart
+Import package:
+    
+import package:flutter/material.dart
+    
+import package:firebase_auth/firebase_auth.dart
+    
+import package:supabase_flutter/supabase_flutter.dart
+    
+import package:cloud_firestore/cloud_firestore.dart
+    
+import package:image_picker/image_picker.dart
+    
+import package:permission_handler/permission_handler.dart
+    
+import dart:io
+Langkah 2: Deklarasikan variabel state
+    • 
+File? _selectedImage — menyimpan file foto yang dipilih
+    • 
+bool _isUploading = false — indikator proses upload
+    • 
+TextEditingController _descController — untuk field deskripsi foto
+    • 
+ImagePicker _picker — instance image picker
+Langkah 3: Buat metode _pickImage(ImageSource source)
+    
+1. Jika source == ImageSource.camera, minta izin kamera:
+      
+await Permission.camera.request()
+    
+2. Jika izin ditolak permanen, tampilkan pesan dan panggil openAppSettings()
+    
+3. Panggil _picker.pickImage() dengan maxWidth: 1920, maxHeight: 1080, imageQuality: 85
+    
+4. Jika file terpilih, set _selectedImage = File(picked.path)
+Langkah 4: Buat metode _uploadPhoto()
+    
+1. Validasi: _selectedImage tidak boleh null
+    
+2. Set _isUploading = true
+    
+3. Buat nama file unik: photos/{uid}/{timestamp}.jpg
+    
+4. Upload ke Supabase Storage bucket 'mycampushub-storage':
+      
+await supabase.storage.from('mycampushub-storage').upload(fileName, _selectedImage!, fileOptions: FileOptions(upsert: true))
+    
+5. Ambil URL publik: supabase.storage.from('mycampushub-storage').getPublicUrl(fileName)
+    
+6. Simpan data ke Firestore collection 'photos' dengan field: uid, url, description, createdAt, fileName
+    
+7. Tampilkan snackbar sukses, reset state
+Langkah 5: Bangun UI Upload Foto
+    
+- AppBar dengan title "Upload Foto" dan backgroundColor AppTheme.uploadFotoColor
+    
+- Area preview foto: GestureDetector onTap → _showPickerOptions()
+      
+berupa Container 260px tinggi, warna abu, rounded border. Jika foto dipilih: tampilkan Image.file
+    
+- Dua tombol OutlinedButton: "Kamera" dan "Galeri" dalam Row
+    
+- TextField deskripsi (maxLines: 3, opsional)
+    
+- LinearProgressIndicator dan teks "Mengupload..." jika _isUploading = true
+    
+- ElevatedButton "Upload Foto" selebar layar
+Langkah 6: Buat metode _showPickerOptions()
+Tampilkan ModalBottomSheet dengan dua opsi ListTile:
+    
+1. "Ambil Foto" → _pickImage(ImageSource.camera)
+    
+2. "Pilih dari Galeri" → _pickImage(ImageSource.gallery)
+C.2 Halaman Upload KTP (ktp_screen.dart)
+Langkah 7: Buat file lib/screens/ktp_screen.dart
+Import package yang sama dengan upload_foto_screen.dart, tambahkan:
+    
+import package:cached_network_image/cached_network_image.dart
+Langkah 8: Deklarasikan variabel state
+    • 
+File? _ktpFile — file KTP yang dipilih
+    • 
+bool _isUploading dan _isLoading
+    • 
+String? _existingUrl — URL KTP yang sudah tersimpan
+    • 
+ImagePicker _picker
+Langkah 9: Buat metode _loadExistingKTP() di initState()
+    
+1. Ambil user dari FirebaseAuth.instance.currentUser
+    
+2. Query Firestore: collection('ktp').doc(user.uid).get()
+    
+3. Jika dokumen ada, set _existingUrl = doc.data()['url']
+    
+4. Set _isLoading = false
+Langkah 10: Buat metode _pickKTP()
+Tampilkan ModalBottomSheet dengan opsi:
+    
+1. "Foto KTP dengan Kamera" → minta izin kamera → _picker.pickImage(source: camera, imageQuality: 90)
+    
+2. "Pilih dari Galeri" → _picker.pickImage(source: gallery, imageQuality: 90)
+Langkah 11: Buat metode _uploadKTP()
+    
+1. Validasi _ktpFile != null
+    
+2. Nama file: ktp/{uid}/ktp.jpg (tetap, agar upsert menimpa file lama)
+    
+3. Upload ke Supabase dengan FileOptions(upsert: true)
+    
+4. Ambil URL publik
+    
+5. Simpan ke Firestore collection 'ktp' doc(uid) dengan field:
+      
+uid, url, uploadedAt, verified: false
+    
+6. Update _existingUrl dan reset _ktpFile
+Langkah 12: Buat metode _deleteKTP()
+    
+1. Tampilkan AlertDialog konfirmasi
+    
+2. Jika dikonfirmasi:
+      
+a. Hapus dari Supabase: supabase.storage.from('mycampushub-storage').remove(['ktp/{uid}/ktp.jpg'])
+      
+b. Hapus dari Firestore: collection('ktp').doc(uid).delete()
+      
+c. Set _existingUrl = null
+Langkah 13: Bangun UI KTP
+    
+- AppBar: "Upload KTP", warna AppTheme.uploadKTPColor
+    
+- Info card biru: teks panduan upload KTP
+    
+- Jika _existingUrl != null: tampilkan CachedNetworkImage KTP tersimpan + tombol Hapus
+    
+- Area pilih file baru: GestureDetector → _pickKTP(), Container 220px dengan ikon kredit card
+    
+- LinearProgressIndicator jika uploading
+    
+- ElevatedButton "Upload KTP"
+C.3 Halaman Upload KTM (ktm_screen.dart)
+Struktur halaman KTM sangat mirip dengan KTP, dengan perbedaan:
+Koleksi Firestore yang digunakan: 'ktm' (bukan 'ktp')
+Path Supabase: ktm/{uid}/ktm.jpg
+Status dokumen: field 'status' dengan nilai 'pending', 'verified', atau 'rejected'
+Widget badge status ditampilkan (kuning/hijau/merah sesuai status)
+AppBar warna: AppTheme.uploadKTMColor (oranye)
+Info card berwarna oranye muda
+Langkah 14: Buat metode _buildStatusBadge(String status)
+Method ini mengembalikan Container dengan warna dan ikon sesuai status:
+    • 
+pending → oranye, ikon Icons.hourglass_top, label "Menunggu Verifikasi"
+    • 
+verified → hijau, ikon Icons.verified, label "Terverifikasi"
+    • 
+rejected → merah, ikon Icons.cancel, label "Ditolak"
+D. Membuat Halaman Beranda (home_screen.dart)
+Halaman beranda merupakan pusat navigasi aplikasi MyCampusHUB. Terdiri dari SliverAppBar, kartu sambutan, grid menu 8 fitur, section pengumuman, dan BottomNavigationBar.
+D.1 Membuat Struktur Dasar HomeScreen
+Langkah 1: Buat file lib/screens/home_screen.dart
+Import semua screen yang akan dinavigasi:
+    
+import screens/gallery_screen.dart, ktp_screen.dart, ktm_screen.dart,
+    
+profile_screen.dart, video_screen.dart, news_screen.dart, contact_screen.dart, upload_foto_screen.dart
+Langkah 2: Deklarasikan variabel state
+    • 
+int _currentIndex = 0 — indeks tab aktif di BottomNav
+    • 
+String _userName — nama user (diisi dari Firestore)
+    • 
+String _userEmail — email user
+    • 
+int _notifCount = 3 — jumlah notifikasi (badge merah)
+Langkah 3: Buat metode _loadUserData() di initState()
+    
+1. Ambil user: FirebaseAuth.instance.currentUser
+    
+2. Query Firestore: collection('users').doc(user.uid).get()
+    
+3. Set _userName dari field 'name' dan _userEmail dari user.email
+Langkah 4: Buat metode _logout()
+    
+1. Tampilkan AlertDialog konfirmasi keluar
+    
+2. Jika dikonfirmasi:
+      
+- FirebaseAuth.instance.signOut()
+      
+- SharedPreferences.clear() — hapus semua data lokal
+      
+- Navigator.pushReplacement ke LoginScreen
+D.2 Mendefinisikan Daftar Menu (Grid)
+Langkah 5: Buat List<Map<String, dynamic>> _menuItems
+Daftar ini berisi 8 menu aplikasi:
+    
+1. Upload Foto — ikon camera_alt_rounded
+    
+2. Galeri — ikon photo_library_rounded
+    
+3. Upload KTP — ikon credit_card_rounded
+    
+4. Upload KTM — ikon badge_rounded
+    
+5. Profil — ikon person_rounded
+    
+6. Video — ikon play_circle_filled_rounded
+    
+7. Berita — ikon newspaper_rounded
+    
+8. Kontak Person — ikon phone_rounded
+Setiap item menyimpan title, icon, color, dan screen key.
+Langkah 6: Buat metode _navigateTo(String screen)
+Gunakan switch-case untuk menentukan Widget tujuan berdasarkan screen key, kemudian panggil Navigator.push() dengan MaterialPageRoute.
+D.3 Membangun UI Beranda
+Langkah 7: Buat Scaffold utama
+Gunakan Scaffold dengan:
+    
+- backgroundColor: Color(0xFFF5F6FA)
+    
+- body: IndexedStack dengan 4 anak: HomeContent, NewsScreen, GalleryScreen, ProfileScreen
+    
+- bottomNavigationBar: _buildBottomNav()
+Langkah 8: Buat _buildSliverAppBar()
+Buat SliverAppBar dengan:
+    
+- expandedHeight: 120, floating: true, pinned: true
+    
+- FlexibleSpaceBar dengan gradient biru sebagai background
+    
+- Di dalam background: Row berisi ikon sekolah + judul "MY CAMPUS HUB" + CircleAvatar + IconButton notifikasi
+    
+- Badge merah pada ikon notifikasi jika _notifCount > 0
+    
+- PopupMenuButton di actions untuk menu Keluar (logout)
+Langkah 9: Buat _buildWelcomeCard()
+Container dengan gradient biru (1976D2 → 42A5F5), rounded 18px, boxShadow.
+Berisi Row:
+    
+- Kolom kiri: Text "Hello, {nama}! " (bold, putih), "Selamat datang kembali!", email user
+    
+- Kanan: CircleAvatar dengan ikon sekolah
+Langkah 10: Buat _buildMenuGrid()
+Gunakan GridView.builder dengan SliverGridDelegateWithFixedCrossAxisCount:
+    
+- crossAxisCount: 2
+    
+- crossAxisSpacing dan mainAxisSpacing: 12
+    
+- childAspectRatio: 1.1
+Setiap item memanggil _buildMenuCard().
+Langkah 11: Buat _buildMenuCard()
+GestureDetector onTap → _navigateTo()
+Container dengan:
+    
+- Warna latar: color dari _menuItems
+    
+- borderRadius: circular(20)
+    
+- boxShadow warna transparan
+    
+- Column: CircleAvatar putih transparan + Icon putih (ukuran 30) + Text label putih bold
+Langkah 12: Buat _buildAnnouncementSection()
+StreamBuilder yang listening Firestore collection 'announcements' (orderBy createdAt, limit 3).
+Tampilkan horizontal scroll Row dari chip pengumuman.
+Jika belum ada data, tampilkan chip default:
+    
+- "Pengumuman KRS Semester Ganjil"
+    
+- "DLA Unasau KTP"
+    
+- "Pengumuman Wisuda 2024"
+Langkah 13: Buat _buildBottomNav()
+BottomNavigationBar dengan 4 item:
+    
+1. Home — Icons.home_rounded
+    
+2. Berita — Icons.newspaper_rounded
+    
+3. Galeri — Icons.photo_library_rounded
+    
+4. Profil — Icons.person_rounded
+selectedItemColor: AppTheme.primaryBlue, type: fixed
+onTap: setState(() => _currentIndex = i)
+E. Menjalankan Aplikasi
+Langkah 1: Hubungkan perangkat atau jalankan emulator
+Pastikan emulator Android berjalan atau perangkat fisik terhubung via USB debugging.
+Langkah 2: Jalankan aplikasi dengan flutter run
+Di terminal VS Code, ketik:
+    
+flutter run
+Atau tekan F5 di VS Code. Untuk browser Chrome:
+    
+flutter run -d chrome
+Langkah 3: Verifikasi Splash Screen
+Aplikasi akan menampilkan Splash Screen selama ±2 detik dengan animasi fade dan scale. Logo ikon sekolah + teks "MY CAMPUS HUB" + CircularProgressIndicator muncul di layar biru gradient.
+Langkah 4: Verifikasi halaman Login
+Setelah splash, aplikasi berpindah ke halaman Login. Coba registrasi akun baru → isi Nama, NIM, Email, Password → tekan "Daftar". Jika berhasil, aplikasi langsung masuk ke HomeScreen.
+Langkah 5: Verifikasi halaman Beranda
+Periksa:
+    ✓ 
+Kartu sambutan menampilkan nama dan email user
+    ✓ 
+Grid 8 menu tampil dalam 2 kolom
+    ✓ 
+Section pengumuman tampil di bawah grid
+    ✓ 
+BottomNavigationBar berfungsi berpindah tab
+Langkah 6: Uji fitur Upload Foto
+    
+1. Tekan menu "Upload Foto" di grid
+    
+2. Tekan area foto atau tombol "Kamera"/"Galeri"
+    
+3. Pilih foto → foto preview muncul
+    
+4. Tambahkan deskripsi (opsional) → tekan "Upload Foto"
+    
+5. Progress bar muncul selama upload
+    
+6. Snackbar hijau "Foto berhasil diupload!" muncul jika sukses
+Langkah 7: Uji fitur Upload KTP
+    
+1. Tekan menu "Upload KTP"
+    
+2. Tekan area kartu KTP → pilih sumber (Kamera/Galeri)
+    
+3. Izinkan akses kamera jika diminta
+    
+4. Tekan "Upload KTP"
+    
+5. Verifikasi: data tersimpan di Supabase Storage (path ktp/{uid}/ktp.jpg) dan di Firestore collection 'ktp'
+Langkah 8: Uji fitur Upload KTM
+    
+Langkah sama dengan Upload KTP. Perhatikan:
+    
+Badge status "Menunggu Verifikasi" (oranye) muncul setelah upload
+    
+Data tersimpan di path ktm/{uid}/ktm.jpg
+    
+Firestore collection 'ktm' berisi field status: 'pending'
+Langkah 9: Uji fitur Logout
+    
+1. Di HomeScreen, tekan ikon ⋮ (titik tiga) di kanan atas
+    
+2. Pilih "Keluar"
+    
+3. Konfirmasi dialog → aplikasi kembali ke LoginScreen
+    
+4. SharedPreferences otomatis dihapus
+— 
+Selesai: Langkah-Langkah Praktikum MyCampusHUB —
+Kesimpulan
+Berdasarkan praktikum yang telah dilakukan, tampilan login sederhana berhasil dibuat dan dijalankan menggunakan Flutter. Aplikasi terdiri dari kolom Username, kolom Password yang karakternya disamarkan dengan obscureText, dan tombol Login yang dibuat dengan ElevatedButton. Tampilan tersebut tersusun dari widget MaterialApp, Scaffold, Center, Padding, Column, dan SizedBox.
+Praktikum ini juga memberikan pemahaman tentang cara membuat project melalui Command Palette pada Visual Studio Code, struktur dasar aplikasi Flutter, serta cara menjalankan aplikasi dengan perintah flutter run pada browser Chrome.
+Logika autentikasi pada tombol Login masih berupa kerangka (komentar pada onPressed) sehingga belum memverifikasi data pengguna. Pengembangan selanjutnya dapat dilakukan dengan menambahkan TextEditingController, validasi input, dan koneksi ke backend. Halaman login ini juga dapat dihubungkan dengan rancangan halaman Unggah Dokumen dan beranda My Campus Hub, sehingga membentuk alur aplikasi yang utuh mulai dari login hingga penggunaan fitur utama.
+Top of Form
+Bottom of Form
+Daftar Pustaka
